@@ -5,7 +5,7 @@
 - Make sure all the templates in the application inherit (using template inheritance with **extends**) from base.html and include at least one additional **'block'**
 - Include at least 2 more template '.html' files that are not provided
 - Have at least one additional template with a Jinja template for loop and another template with a Jinja template conditional (could be same or different templates)
-- 404 error handling and template
+- **404 error handling and template**
 - At least 1 REST API request based on data submitted in a WTForm
 - At least 1 not provided WTForm that sends a GET request to a **NEW** page
 - At least 1 not provided WTForm that sends a POST request to the **SAME** page
