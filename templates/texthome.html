@@ -3,8 +3,17 @@
 {% block content1 %}
 <h1 style="text-align:center;">Welcome {{user}}!</h1>
 <h3 style="text-align:center;">CHOOSE SOMETHING DANG IT</h3>
-<a href="{{ url_for('swear_check_route') }}"><button style="margin:auto;width:170px;height:25px;cursor:pointer;">Check For Swearwords</button></a><br><br>
-<a href="{{ url_for('swear_check_route') }}"><button style="margin:auto;width:170px;height:25px;cursor:pointer;">Check For Swearwords</button></a><br><br>
+
+<form action="{{ url_for('swear_check_route') }}" method="GET">
+    <input type="text" name="user" value="{{user}}" style="display:none">
+    <input type="submit" value="Check For Swearwords" style="margin:auto;width:170px;height:25px;cursor:pointer;">
+</form>
+
+<form action="{{ url_for('insult_route') }}" method="GET">
+    <input type="text" name="user" value="{{user}}" style="display:none">
+    <input type="submit" value="Insult Generator" style="margin:auto;width:170px;height:25px;cursor:pointer;">
+</form>
+
 <a href="{{ url_for('login') }}"><button style="margin:auto;width:170px;height:25px;background:red;border:none;color:white;cursor:pointer;">Log Out</button></a>
 
 {% endblock %}

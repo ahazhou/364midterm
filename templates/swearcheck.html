@@ -36,5 +36,20 @@
     {% endif %}
 </div>
 
+<hr>
+
+<div>
+    <h3>Input History:</h3>
+    {% for n in textHistory %}
+        <h4 style="margin:0">User {{n.userID}}: {{ user[n.userID - 1] }}</h4>
+        <p style="margin:0">Input: {{ n.originalString }}</p>
+        <p style="margin:0">Has bad word: {{ n.hasSwearWord }}</p>
+        {% if n.hasSwearWord %}
+        <p style="margin:0">Censored input: {{ n.cleanStringResult }}</p>
+        {% endif %}
+        <br>
+    {% endfor %}
+</div>
+
 
 {% endblock %}

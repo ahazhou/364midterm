@@ -10,7 +10,7 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, TextAreaField, SubmitField, ValidationError # Note that you may need to import more here! Check out examples that do what you want to figure out what.
 from wtforms.validators import Required, Length # Here, too
 from flask_sqlalchemy import SQLAlchemy
-import requests, json, re
+import requests, json, re, random
 
 ## App setup code
 app = Flask(__name__)
@@ -38,6 +38,66 @@ def cleanString(input):
         response = "Unfortunately, the API is down so let's settle with giving me a 100%."
     return response.json()["result"]
 
+def checkUser_SendDBHelper(currentUser):
+    if currentUser == None or currentUser == "":#if null, it's anonymous; that's why they can't have the username anonymous
+            currentUser = "anonymous"
+    #if user doesn't exist, add it
+    dbUser = User.query.filter_by(user=currentUser).first() 
+    if dbUser is None:
+        #send to user db
+        user = User(user=currentUser)
+        db.session.add(user)
+        db.session.commit()
+        return (currentUser, user.id)
+    else:
+        return (currentUser, dbUser.id)
+
+def InsultGenerator(fromname, toname):
+    insultIDList=[
+        "/bag/"+fromname,
+        "/because/"+fromname,
+        "/blackadder/"+toname+'/'+fromname,
+        "/bm/"+toname+'/'+fromname,
+        "/bucket/"+fromname,
+        "/bus/"+toname+'/'+fromname,
+        "/bye/"+fromname,
+        "/chainsaw/"+toname+'/'+fromname,
+        "/cocksplat/"+toname+'/'+fromname,
+        "/cool/"+fromname,
+        "/cup/"+fromname,
+        "/dalton/"+toname+'/'+fromname,
+        "/deraadt/"+toname+'/'+fromname,
+        "/diabetes/"+fromname,
+        "/donut/"+toname+'/'+fromname,
+        "/fascinating/"+fromname,
+        "/field/"+toname+'/'+fromname+'/'+"Oprah",
+        "/gfy/"+toname+'/'+fromname,
+        "/horse/"+fromname,
+        "/immensity/"+fromname,
+        "/keep/"+toname+'/'+fromname,
+        "/king/"+toname+'/'+fromname,
+        "/linus/"+toname+'/'+fromname,
+        "/looking/"+fromname,
+        "/madison/"+toname+'/'+fromname,
+        "/maybe/"+fromname,
+        "/nugget/"+toname+'/'+fromname,
+        "/outside/"+toname+'/'+fromname,
+        "/problem/"+toname+'/'+fromname,
+        "/programmer/"+fromname,
+        "/question/"+fromname,
+        "/shakespeare/"+toname+'/'+fromname,
+        "/too/"+fromname,
+        "/tucker/"+fromname,
+        "/yoda/"+toname+'/'+fromname
+    ]
+    foaasAPI = "http://www.foaas.com" + insultIDList[random.randint(1,len(insultIDList))]
+    headers = {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+    }
+    response = requests.get(foaasAPI, headers=headers)
+    return response.json()["message"]
+
 
 ##################
 ##### MODELS #####
@@ -57,22 +117,14 @@ class Name(db.Model):
 class User(db.Model):#No repeats
     __tablename__ = "User"
     id = db.Column(db.Integer,primary_key=True)
-    name = db.Column(db.String(124), unique=True)
+    user = db.Column(db.String(124), unique=True)
     def __repr__(self):
-        return "User {}: {}".format(self.id, self.name)
-
-class InputHistory(db.Model):
-    __tablename__ = "History"
-    id = db.Column(db.Integer,primary_key=True)
-    userID = db.Column(db.Integer)
-    swearStringCheck = db.Column(db.Integer)
-    foaasAPISearchID = db.Column(db.Integer)
-    def __repr__(self):
-        return "Table ID: {} from userID {}".format(self.id, self.userid)
+        return "{}".format(self.user)
 
 class StringCheck(db.Model):
     __tablename__ = "swearStringCheckHistory"
     id = db.Column(db.Integer, primary_key=True)
+    userID = db.Column(db.Integer)
     originalString = db.Column(db.String)
     hasSwearWord = db.Column(db.Boolean)
     cleanStringResult = db.Column(db.String)
@@ -82,12 +134,11 @@ class StringCheck(db.Model):
 class FOAASAPISearchHistory(db.Model):
     __tablename__ = "foaasAPISearchHistory"
     id = db.Column(db.Integer,primary_key=True)
+    userID = db.Column(db.Integer)
     insultID = db.Column(db.Integer)
     insultResult = db.Column(db.String)
     def __repr__(self):
         return "InsultID: {} returns {}".format(self.insultID, self.insultResult)
-
-
 
 
 ###################
@@ -150,30 +201,39 @@ def login():
             return render_template("login.html", form=form, error=errorString)
         elif request.args.get("username") == "":
             return render_template("login.html", form=form, error="Don't do that.")
+        #End error checking
         return redirect(url_for('mainroute', user=request.args.get("username")))
     
     return render_template("login.html", form=form, error = "")
 
 @app.route('/mainroute', methods=['POST', 'GET'])
 def mainroute():
-    currentUser = request.args.get("user")
-    if currentUser == "":#if null, it's anonymous; that's why they can't have the username anonymous
-        currentUser = "anonymous"
-    
+    currentUser=request.args.get("user")
+    currentUser=checkUser_SendDBHelper(currentUser)[0]
     return render_template("texthome.html", user=currentUser)
 
-@app.route('/texts', methods = ['POST', 'GET'])
+@app.route('/swearcheck', methods = ['POST', 'GET'])
 def swear_check_route():
     text = TextMainForm()
     if request.method == 'POST' and text.validate_on_submit():
         googleSwearAPI = "http://www.wdylike.appspot.com/?q=" + text.text.data
         response = requests.get(googleSwearAPI)
-        return render_template("swearcheck.html",form=text,hasSwear=response.json(),text=text.text.data,cleanString=cleanString)
+        #check current userID
+        currentUser=request.args.get("user")
+        #send to StringCheck db
+        stringcheck = StringCheck(userID=checkUser_SendDBHelper(currentUser)[1],originalString=text.text.data,hasSwearWord=response.json(),cleanStringResult=cleanString(text.text.data))
+        db.session.add(stringcheck)
+        db.session.commit()
+        #save to 
+        return render_template("swearcheck.html",form=text,hasSwear=response.json(),text=text.text.data,cleanString=cleanString,textHistory=StringCheck.query.all(),user=User.query.all())
     errors = [error for error in text.errors.values()]
     if len(errors) > 0:
         flash(str(errors))
-    return render_template("swearcheck.html",form=text,hasSwear="",text="",cleanString=cleanString)
+    return render_template("swearcheck.html",form=text,hasSwear="",text="",cleanString=cleanString,textHistory=StringCheck.query.all(),user=User.query.all())
 
+@app.route('/insult', methods = ['POST', 'GET'])
+def insult_route():
+    return render_template("uniqueInsult.html",insult=InsultGenerator("name1", "name2"))
 
 
 
