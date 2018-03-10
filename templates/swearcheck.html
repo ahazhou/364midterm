@@ -1,0 +1,40 @@
+{% extends 'texthome.html' %}
+
+{% block content1 %}
+<h1>This is some rando page to check text for...something. Be nice.</h1>
+
+<form method="POST">
+    {{ form.hidden_tag() }}<!--This acts as the {{ form.csrf_token }} where we need cross browser validation in the form to validate the form results-->
+    {{ form.text.label() }}
+    <br>
+    {{ form.text(style="width:300px;height:100px;margin-top:10px;margin-bottom:10px;") }}
+    <br>
+    {{ form.submit() }}
+</form>
+
+<div style="margin-bottom:20px;">
+    {% for message in get_flashed_messages() %}
+        <strong style="color:red;">{{ message }}</strong>
+    {% endfor %}
+</div>
+
+<div>
+    {% if hasSwear != "" %}
+    {% if hasSwear %}
+    <h3 style="color:red">Damn straight there's at least one bad word in this.</h3>
+    {% elif not hasSwear %}
+    <h3 style="color:green">Unfortunately, the text is all clean.</h3> 
+    {% endif %}
+    <h4 style="margin:0">The text in question:</h4>
+    <p style="margin:0">"{{ text }}"</p>
+    <br>
+    {% if hasSwear %}
+    <h4 style="margin:0">You know what, let me help you clean this dirty little text</h4>
+    <p style="margin:0">"{{cleanString(text)}}"</p>
+
+    {% endif %}
+    {% endif %}
+</div>
+
+
+{% endblock %}

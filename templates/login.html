@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block content1 %}
+<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Great+Vibes">
+<h1 style="text-align:center;font-family:Great Vibes, cursive;font-size:calc(20px + 3vw);margin-bottom:5px;">
+    To provide the most</h1>
+<h1 style="text-align:center;color:darkblue;font-family:Great Vibes, cursive;font-size:calc(30px + 4vw);margin:0;text-decoration:underline;">exquisite</h1>
+<h1 style="text-align:center;font-family:Great Vibes, cursive;font-size:calc(20px + 3vw);margin-top:5px;">service for visiting this modest website, we request that you log in.</h1>
+
+<form method="GET" style="border:1px solid black;max-width:500px;width:90%;height:70px;margin:auto;padding:5px;position:relative;">
+    {{ form.hidden_tag() }}<!--This acts as the {{ form.csrf_token }} where we need cross browser validation in the form to validate the form results-->
+    {{ form.username.label() }} {{ form.username() }}
+    <br>
+    {{ form.submit(style="background:green;width:100px;height:30px;border:none;cursor:pointer;margin:auto;position:absolute;left:50%;transform:translateX(-50%);bottom:5px;color:white;") }}
+</form>
+
+{% if error != "" %}
+<h3 style="color:red;text-align:center">{{ error }}</h3>
+{% endif %}
+
+{% endblock %}
