@@ -21,7 +21,7 @@
 - **Write code in your file to allow a user submit duplicate data to a form, but will not save duplicate data (like the user should not be able to submit the same exact tweet)**
 - **Bold completed tasks in this document**
 - **Include list of all routes that exist int eh app and the names of templates each one should render such as /form => form.html or /form/<artist_name> => artist_links.html in this document**
-- Contain at least 1 line of description of what your app is about or should do in this document
+- **Contain at least 1 line of description of what your app is about or should do in this document**
 
 ###ROUTES###
 / => base.html
