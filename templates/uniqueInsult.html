@@ -1,7 +1,26 @@
 {% extends 'texthome.html' %}
 
 {% block content1 %}
-<h1>Insult me. *ahem* you.</h1>
-
-<h3>{{insult}}</h3>
+<h1 style="text-align:center">Insult me. *ahem* you.</h1>
+<h2 style="text-align:center">You're being pretty mean huh.</h2>
+<form method="POST" style="max-width:300px;width:90%;margin:auto;padding:5px;position:relative;">
+    {{ form.hidden_tag() }}<!--This acts as the {{ form.csrf_token }} where we need cross browser validation in the form to validate the form results-->
+    {{ form.target.label() }}{{ form.target() }}<br><br>
+    {{ form.submit() }}
+</form>
+{% if insult != "" %}
+<div style="border:2px solid red;width:50%;margin:0 auto;box-shadow: 10px 10px 5px grey;margin-bottom:20px;">
+    <h2 style="text-align:center;margin-bottom:0;color: white;text-shadow: 1px 1px 2px black, 0 0 25px blue, 0 0 5px darkblue;">{{insult}}</h2>
+    <h3 style="text-align:center;margin-top:0;text-shadow: 0 0 3px #FF0000, 0 0 5px #0000FF;">{{insultFrom}}</h3>    
+</div>
+{% endif %}
+<div>
+    <hr>
+    <h3>Input History:</h3>
+    {% for n in insultList %}
+        <h4 style="margin:0">User {{n.userID}}: {{ user[n.userID - 1] }}</h4>
+        <p style="margin:0">Insult: {{ n.insultResult }}</p>
+        <br>
+    {% endfor %}
+</div>
 {% endblock %}

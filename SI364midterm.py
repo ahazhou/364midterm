@@ -90,13 +90,14 @@ def InsultGenerator(fromname, toname):
         "/tucker/"+fromname,
         "/yoda/"+toname+'/'+fromname
     ]
-    foaasAPI = "http://www.foaas.com" + insultIDList[random.randint(1,len(insultIDList))]
+    insultID = random.randint(0,len(insultIDList)-1)
+    foaasAPI = "http://www.foaas.com" + insultIDList[insultID]
     headers = {
         'Accept': 'application/json',
         'Content-Type': 'application/json'
     }
     response = requests.get(foaasAPI, headers=headers)
-    return response.json()["message"]
+    return [response.json()["message"], response.json()["subtitle"], insultID]
 
 
 ##################
@@ -169,6 +170,10 @@ class TextMainForm(FlaskForm):
             return False
         return True
 
+class InsultInputForm(FlaskForm):
+    target = StringField("Who are you targeting?<br>You know you're not being very nice huh.<br>",validators=[Required()])
+    submit = SubmitField()
+
 #######################
 ###### VIEW FXNS ######
 #######################
@@ -198,13 +203,13 @@ def login():
     if request.method == 'GET' and request.args.get("username") != None:
         if request.args.get("username").lower() == "anonymous":#don't do that
             errorString = "But not '" + request.args.get("username") + "'."
-            return render_template("login.html", form=form, error=errorString)
+            return render_template("login.html", form=form, error=errorString, users = User.query.all())
         elif request.args.get("username") == "":
-            return render_template("login.html", form=form, error="Don't do that.")
+            return render_template("login.html", form=form, error="Don't do that.", users = User.query.all())
         #End error checking
         return redirect(url_for('mainroute', user=request.args.get("username")))
     
-    return render_template("login.html", form=form, error = "")
+    return render_template("login.html", form=form, error = "", users = User.query.all())
 
 @app.route('/mainroute', methods=['POST', 'GET'])
 def mainroute():
@@ -233,7 +238,16 @@ def swear_check_route():
 
 @app.route('/insult', methods = ['POST', 'GET'])
 def insult_route():
-    return render_template("uniqueInsult.html",insult=InsultGenerator("name1", "name2"))
+    form = InsultInputForm()
+    if request.method == 'POST' and form.validate_on_submit():#post requests need the hidden_tag() to do CSRF validation
+        currentUser = checkUser_SendDBHelper(request.args.get("user"))
+        insultResult=InsultGenerator(currentUser[0], form.target.data)
+        #Gotta add the insult to the insult db which is FOAASAPISearchHistory
+        foaahistory = FOAASAPISearchHistory(userID=currentUser[1],insultID=insultResult[2],insultResult=insultResult[0])
+        db.session.add(foaahistory)
+        db.session.commit()
+        return render_template("uniqueInsult.html",insult=insultResult[0],insultFrom=insultResult[1],form=form,insultList=FOAASAPISearchHistory.query.all(),user=User.query.all())
+    return render_template("uniqueInsult.html",insult="",form=form,insultList=FOAASAPISearchHistory.query.all(),user=User.query.all())
 
 
 

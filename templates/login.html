@@ -4,7 +4,7 @@
 <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Great+Vibes">
 <h1 style="text-align:center;font-family:Great Vibes, cursive;font-size:calc(20px + 3vw);margin-bottom:5px;">
     To provide the most</h1>
-<h1 style="text-align:center;color:darkblue;font-family:Great Vibes, cursive;font-size:calc(30px + 4vw);margin:0;text-decoration:underline;">exquisite</h1>
+<h1 style="text-align:center;color:darkgreen;font-family:Great Vibes, cursive;font-size:calc(30px + 4vw);margin:0;text-decoration:underline;">exquisite</h1>
 <h1 style="text-align:center;font-family:Great Vibes, cursive;font-size:calc(20px + 3vw);margin-top:5px;">service for visiting this modest website, we request that you log in.</h1>
 
 <form method="GET" style="border:1px solid black;max-width:500px;width:90%;height:70px;margin:auto;padding:5px;position:relative;">
@@ -17,5 +17,15 @@
 {% if error != "" %}
 <h3 style="color:red;text-align:center">{{ error }}</h3>
 {% endif %}
+
+<div>
+    <hr>
+    <h2 style="margin-bottom:0;">User List:</h2>
+    <td>
+        {% for n in users %}
+            <li>{{ n.user }}</li>
+        {% endfor %}
+    </td>
+</div>
 
 {% endblock %}
