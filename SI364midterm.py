@@ -30,6 +30,13 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
 ## Set up Shell context so it's easy to use the shell to debug
+# Set up Flask debug stuff
+manager = Manager(app)
+# moment = Moment(app) # For time # Later
+
+migrate = Migrate(app, db) # For database use/updating
+manager.add_command('db', MigrateCommand) # Add migrate command to manager
+mail = Mail(app) # For email sending
 # Define function
 def make_shell_context():
     return dict( app=app, db=db, Song=Song, Artist=Artist, Album=Album)
