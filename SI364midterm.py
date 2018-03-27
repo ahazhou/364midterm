@@ -11,6 +11,7 @@ from wtforms import StringField, TextAreaField, SubmitField, ValidationError # N
 from wtforms.validators import Required, Length # Here, too
 from flask_sqlalchemy import SQLAlchemy
 import requests, json, re, random
+from flask_script import Manager, Shell
 
 ## App setup code
 app = Flask(__name__)
