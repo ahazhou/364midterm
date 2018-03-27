@@ -14,6 +14,9 @@ import requests, json, re, random
 from flask_script import Manager, Shell
 from flask_migrate import Migrate, MigrateCommand # needs: pip/pip3 install flask-migrate
 
+from flask_mail import Mail, Message
+from threading import Thread
+from werkzeug import secure_filename
 
 ## App setup code
 app = Flask(__name__)
