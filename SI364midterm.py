@@ -44,7 +44,7 @@ manager.add_command('db', MigrateCommand) # Add migrate command to manager
 mail = Mail(app) # For email sending
 # Define function
 def make_shell_context():
-    return dict( app=app, db=db, Song=Song, Artist=Artist, Album=Album)
+    return dict( app=app, db=db, Name=Name, User=User, StringCheck=StringCheck, FOAASAPISearchHistory=FOAASAPISearchHistory)
 # Add function use to manager
 manager.add_command("shell", Shell(make_context=make_shell_context))
 
