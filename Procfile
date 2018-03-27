@@ -1,1 +1,1 @@
-web: gunicorn main_app:app
+web: gunicorn SI364midterm:app
