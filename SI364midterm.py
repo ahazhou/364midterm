@@ -12,6 +12,8 @@ from wtforms.validators import Required, Length # Here, too
 from flask_sqlalchemy import SQLAlchemy
 import requests, json, re, random
 from flask_script import Manager, Shell
+from flask_migrate import Migrate, MigrateCommand # needs: pip/pip3 install flask-migrate
+
 
 ## App setup code
 app = Flask(__name__)
